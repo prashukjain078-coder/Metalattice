@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+html {
+    background: #fff;
+}
+
+body {
+    background: #fff;
+    color: #000;
+    font-family: Inter, system-ui, sans-serif;
+}
+
+@property --cta-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+.cta-btn {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.95rem 1.75rem;
+    border: 0;
+    border-radius: 0.75rem;
+    background: #080B10;
+    color: #F4F7FB;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.35s ease;
+}
+
+/* rotating gradient border */
+.cta-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    padding: 1.5px;
+    border-radius: inherit;
+    background: conic-gradient(from var(--cta-angle),
+            #00E5FF, #8B5CF6, #00E5FF 45%, rgba(0, 229, 255, 0) 70%, #00E5FF);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: cta-spin 3.5s linear infinite;
+}
+
+/* shine sweep */
+.cta-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(110deg, transparent 30%, rgba(0, 229, 255, 0.18) 50%, transparent 70%);
+    transform: translateX(-110%);
+    transition: transform 0.8s ease;
+}
+
+.cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 28px rgba(0, 229, 255, 0.25), 0 0 64px rgba(139, 92, 246, 0.18);
+}
+
+.cta-btn:hover::after {
+    transform: translateX(110%);
+}
+
+.cta-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.cta-btn:focus-visible {
+    outline: 2px solid #00E5FF;
+    outline-offset: 3px;
+}
+
+.cta-btn .cta-arrow {
+    transition: transform 0.25s ease;
+}
+
+.cta-btn:hover .cta-arrow {
+    transform: translateX(4px);
+}
+
+/* quieter secondary version */
+.cta-btn-ghost::before {
+    background: #263342;
+    animation: none;
+}
+
+.cta-btn-ghost:hover::before {
+    background: #98A6B8;
+}
+
+@keyframes cta-spin {
+    to {
+        --cta-angle: 360deg;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cta-btn::before {
+        animation: none;
+    }
+
+    .cta-btn,
+    .cta-btn::after,
+    .cta-btn .cta-arrow {
+        transition: none;
+    }
+}
+@property --cta-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.cta-btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.95rem 1.75rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: #080B10;
+  color: #F4F7FB;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.35s ease;
+}
+
+.cta-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  padding: 1.5px;
+  border-radius: inherit;
+  background: conic-gradient(from var(--cta-angle), #00E5FF, #8B5CF6, #00E5FF 45%, rgba(0, 229, 255, 0) 70%, #00E5FF);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cta-spin 3.5s linear infinite;
+}
+
+.cta-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(110deg, transparent 30%, rgba(0, 229, 255, 0.18) 50%, transparent 70%);
+  transform: translateX(-110%);
+  transition: transform 0.8s ease;
+}
+
+.cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px rgba(0, 229, 255, 0.25), 0 0 64px rgba(139, 92, 246, 0.18);
+}
+.cta-btn:hover::after { transform: translateX(110%); }
+.cta-btn:active { transform: translateY(0) scale(0.98); }
+.cta-btn:focus-visible { outline: 2px solid #00E5FF; outline-offset: 3px; }
+
+.cta-btn .cta-arrow { transition: transform 0.25s ease; }
+.cta-btn:hover .cta-arrow { transform: translateX(4px); }
+
+.cta-btn-ghost::before { background: #263342; animation: none; }
+.cta-btn-ghost:hover::before { background: #98A6B8; }
+
+@keyframes cta-spin { to { --cta-angle: 360deg; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .cta-btn::before { animation: none; }
+  .cta-btn, .cta-btn::after, .cta-btn .cta-arrow { transition: none; }
+}
