@@ -1,0 +1,3141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MetaLattice | Next-Generation Computational Design & Engineering Software</title>
+  <meta name="description" content="MetaLattice accelerates advanced engineering with implicit modeling, AI-driven computational design, and multiphysics optimization for additive and advanced manufacturing.">
+  
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 CDN for modern tech icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    /* ==========================================================================
+       1. CSS VARIABLES & BASE RESETS
+       ========================================================================== */
+    :root {
+      --bg-dark: #07080d;
+      --bg-darker: #040508;
+      --bg-surface: rgba(14, 17, 28, 0.7);
+      --bg-card: rgba(255, 255, 255, 0.035);
+      --bg-card-hover: rgba(255, 255, 255, 0.065);
+      --border-subtle: rgba(255, 255, 255, 0.09);
+      --border-glow: rgba(0, 168, 255, 0.35);
+      --border-glow-purple: rgba(124, 58, 237, 0.4);
+      
+      --accent-blue: #00a8ff;
+      --accent-purple: #7c3aed;
+      --accent-cyan: #00e5ff;
+      --accent-emerald: #10b981;
+      
+      --gradient-primary: linear-gradient(135deg, #00a8ff 0%, #7c3aed 100%);
+      --gradient-accent: linear-gradient(135deg, #00e5ff 0%, #00a8ff 50%, #7c3aed 100%);
+      --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%);
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      --container-max: 1240px;
+      --transition-smooth: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      --transition-slow: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Background Ambient Mesh Light */
+    body::before {
+      content: "";
+      position: fixed;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(0, 168, 255, 0.12) 0%, rgba(124, 58, 237, 0.08) 45%, transparent 70%);
+      filter: blur(120px);
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      bottom: -10%;
+      right: -10%;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, rgba(124, 58, 237, 0.1) 0%, rgba(0, 229, 255, 0.05) 50%, transparent 70%);
+      filter: blur(140px);
+      z-index: -2;
+      pointer-events: none;
+    }
+
+    /* Subtle grid lattice background pattern */
+    .bg-grid-pattern {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at 50% 30%, black 40%, transparent 80%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+      transition: var(--transition-smooth);
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      outline: none;
+      background: none;
+    }
+
+    img, svg {
+      display: block;
+      max-width: 100%;
+    }
+
+    /* Container Utility */
+    .container {
+      width: 100%;
+      max-width: var(--container-max);
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+
+    /* Section Spacing - Generous 100px vertical padding */
+    .section {
+      padding: 100px 0;
+      position: relative;
+    }
+
+    /* Typography Utilities */
+    .gradient-text {
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline;
+    }
+
+    .gradient-text-cyan {
+      background: linear-gradient(135deg, #00e5ff 0%, #00a8ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent-cyan);
+      background: rgba(0, 229, 255, 0.07);
+      border: 1px solid rgba(0, 229, 255, 0.22);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      margin-bottom: 1.25rem;
+    }
+
+    .eyebrow i {
+      font-size: 0.7rem;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 760px;
+      margin: 0 auto 4rem auto;
+    }
+
+    .section-title {
+      font-size: 2.75rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+      color: #ffffff;
+    }
+
+    .section-subtitle {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* Glassmorphism Cards */
+    .glass-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 16px;
+      padding: 2.25rem;
+      transition: var(--transition-smooth);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      opacity: 0.6;
+    }
+
+    .glass-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--border-glow);
+      background: var(--bg-card-hover);
+      box-shadow: 0 16px 36px -12px rgba(0, 168, 255, 0.15), 0 0 20px 1px rgba(0, 168, 255, 0.1);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      padding: 0.85rem 1.85rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 10px;
+      transition: var(--transition-smooth);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: #ffffff;
+      box-shadow: 0 0 25px rgba(0, 168, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::after {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(60deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+      transform: rotate(25deg) translateY(-100%);
+      transition: transform 0.75s ease;
+    }
+
+    .btn-primary:hover::after {
+      transform: rotate(25deg) translateY(100%);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 35px rgba(0, 168, 255, 0.65), 0 0 15px rgba(124, 58, 237, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-main);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .btn-sm {
+      padding: 0.6rem 1.25rem;
+      font-size: 0.85rem;
+      border-radius: 8px;
+    }
+
+    /* Scroll Animation Base */
+    .fade-in-element {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: opacity, transform;
+    }
+
+    .fade-in-element.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==========================================================================
+       2. NAVIGATION BAR
+       ========================================================================== */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+      padding: 1.1rem 0;
+      background: rgba(7, 8, 13, 0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: var(--transition-smooth);
+    }
+
+    .navbar.scrolled {
+      padding: 0.8rem 0;
+      background: rgba(7, 8, 13, 0.92);
+      border-bottom-color: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Logo */
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.03em;
+    }
+
+    .logo-icon-svg {
+      width: 32px;
+      height: 32px;
+      filter: drop-shadow(0 0 10px rgba(0, 168, 255, 0.6));
+    }
+
+    .nav-logo span {
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Nav Links & Dropdowns */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      list-style: none;
+    }
+
+    .nav-item {
+      position: relative;
+    }
+
+    .nav-link {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.5rem 0;
+    }
+
+    .nav-link i.fa-chevron-down {
+      font-size: 0.65rem;
+      transition: transform 0.25s ease;
+      color: var(--text-dim);
+    }
+
+    .nav-link:hover {
+      color: #ffffff;
+    }
+
+    .nav-item:hover .nav-link i.fa-chevron-down {
+      transform: rotate(180deg);
+      color: var(--accent-cyan);
+    }
+
+    /* Dropdown Menu */
+    .nav-dropdown {
+      position: absolute;
+      top: 100%;
+      left: -1rem;
+      width: 270px;
+      background: rgba(11, 13, 23, 0.95);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 0.75rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 168, 255, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      list-style: none;
+    }
+
+    .nav-item:hover .nav-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(4px);
+    }
+
+    .dropdown-link {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.85rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      transition: var(--transition-smooth);
+    }
+
+    .dropdown-link:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .dropdown-icon {
+      font-size: 1rem;
+      color: var(--accent-cyan);
+      margin-top: 0.15rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .dropdown-content .dropdown-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 0.15rem;
+    }
+
+    .dropdown-content .dropdown-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* Nav Actions Right */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .nav-signin {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 0.5rem 0.75rem;
+    }
+
+    .nav-signin:hover {
+      color: #ffffff;
+    }
+
+    /* Mobile Hamburger */
+    .mobile-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      padding: 6px;
+      cursor: pointer;
+    }
+
+    .mobile-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: #ffffff;
+      border-radius: 2px;
+      transition: var(--transition-smooth);
+    }
+
+    /* Mobile Drawer */
+    .mobile-drawer {
+      display: none;
+      position: fixed;
+      top: 68px;
+      left: 0;
+      width: 100%;
+      height: calc(100vh - 68px);
+      background: rgba(7, 8, 13, 0.98);
+      backdrop-filter: blur(25px);
+      padding: 2rem;
+      overflow-y: auto;
+      z-index: 999;
+      transform: translateX(-100%);
+      transition: transform 0.35s ease-in-out;
+    }
+
+    .mobile-drawer.open {
+      transform: translateX(0);
+    }
+
+    .mobile-drawer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .mobile-drawer-link {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: block;
+    }
+
+    .mobile-drawer-sublinks {
+      list-style: none;
+      padding-left: 1rem;
+      margin-top: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .mobile-drawer-sublink {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       3. HERO SECTION
+       ========================================================================== */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding-top: 140px;
+      padding-bottom: 80px;
+      overflow: hidden;
+    }
+
+    /* Canvas Particle Lattice Background */
+    #heroCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: auto;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(7, 8, 13, 0.3) 0%, rgba(7, 8, 13, 0.85) 75%, var(--bg-dark) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .hero-container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .hero-headline {
+      font-size: clamp(2.75rem, 6.5vw, 5.25rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.75rem;
+      color: #ffffff;
+    }
+
+    .hero-subheadline {
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 780px;
+      margin: 0 auto 2.5rem auto;
+      font-weight: 400;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      margin-bottom: 3.5rem;
+    }
+
+    .hero-trust-tag {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-trust-tag span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .hero-trust-tag i {
+      color: var(--accent-emerald);
+      font-size: 0.75rem;
+    }
+
+    /* Floating Stats Row in Hero */
+    .hero-stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+
+    .hero-stat-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      border-radius: 14px;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      transition: var(--transition-smooth);
+    }
+
+    .hero-stat-card:hover {
+      border-color: rgba(0, 168, 255, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .hero-stat-number {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      margin-bottom: 0.35rem;
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent-cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ==========================================================================
+       4. TRUSTED BY SECTION
+       ========================================================================== */
+    .trusted-by {
+      padding: 60px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(4, 5, 8, 0.5);
+    }
+
+    .trusted-label {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 2.25rem;
+    }
+
+    .trusted-logos-grid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+
+    .logo-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.35);
+      transition: var(--transition-smooth);
+      cursor: default;
+    }
+
+    .logo-item svg, .logo-item i {
+      font-size: 1.35rem;
+      color: rgba(255, 255, 255, 0.35);
+      transition: var(--transition-smooth);
+    }
+
+    .logo-item:hover {
+      color: #ffffff;
+      filter: drop-shadow(0 0 12px rgba(0, 168, 255, 0.5));
+    }
+
+    .logo-item:hover svg, .logo-item:hover i {
+      color: var(--accent-cyan);
+    }
+
+    /* ==========================================================================
+       5. CORE PLATFORM FEATURES (3-column grid)
+       ========================================================================== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+    }
+
+    .feature-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .feature-icon-wrapper {
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(0, 168, 255, 0.15) 0%, rgba(124, 58, 237, 0.15) 100%);
+      border: 1px solid rgba(0, 168, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      color: var(--accent-cyan);
+      margin-bottom: 1.5rem;
+      box-shadow: 0 8px 20px -6px rgba(0, 168, 255, 0.3);
+      transition: var(--transition-smooth);
+    }
+
+    .feature-card:hover .feature-icon-wrapper {
+      transform: scale(1.08);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.45);
+    }
+
+    .feature-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.85rem;
+      letter-spacing: -0.01em;
+    }
+
+    .feature-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .feature-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .feature-tag {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      background: rgba(0, 229, 255, 0.06);
+      border: 1px solid rgba(0, 229, 255, 0.15);
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+
+    /* ==========================================================================
+       6. HOW IT WORKS (3-step timeline section)
+       ========================================================================== */
+    .timeline-container {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    /* Connector line between steps */
+    .timeline-connector {
+      position: absolute;
+      top: 50px;
+      left: 15%;
+      right: 15%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-cyan) 0%, var(--accent-blue) 50%, var(--accent-purple) 100%);
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    .timeline-card {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .timeline-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .step-badge {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--bg-darker);
+      border: 2px solid var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #ffffff;
+      box-shadow: 0 0 20px rgba(0, 168, 255, 0.4);
+    }
+
+    .step-badge.step-2 {
+      border-color: var(--accent-purple);
+      box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+    }
+
+    .step-badge.step-3 {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+    }
+
+    .step-status-chip {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .timeline-card-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.85rem;
+    }
+
+    .timeline-card-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Mock Technical Visual inside Timeline Card */
+    .tech-code-box {
+      background: rgba(4, 5, 8, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: #94a3b8;
+      overflow-x: auto;
+    }
+
+    .tech-code-box .code-highlight {
+      color: var(--accent-cyan);
+    }
+
+    .tech-code-box .code-purple {
+      color: #c084fc;
+    }
+
+    .tech-code-box .code-green {
+      color: var(--accent-emerald);
+    }
+
+    /* ==========================================================================
+       7. INDUSTRY SOLUTIONS (2x2 visual grid)
+       ========================================================================== */
+    .solutions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    .solution-card {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 2.75rem;
+      backdrop-filter: blur(14px);
+      transition: var(--transition-smooth);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .solution-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--border-glow);
+      box-shadow: 0 20px 40px -15px rgba(0, 168, 255, 0.2);
+    }
+
+    .solution-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+    }
+
+    .solution-icon {
+      font-size: 2rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .solution-metric-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-emerald);
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 4px 12px;
+      border-radius: 9999px;
+    }
+
+    .solution-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.85rem;
+      letter-spacing: -0.02em;
+    }
+
+    .solution-desc {
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 1.75rem;
+    }
+
+    .solution-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--accent-cyan);
+      transition: var(--transition-smooth);
+    }
+
+    .solution-link:hover {
+      gap: 0.8rem;
+      color: #ffffff;
+      filter: drop-shadow(0 0 8px var(--accent-cyan));
+    }
+
+    /* ==========================================================================
+       8. SOCIAL PROOF / METRICS SECTION (Dark with gradient bg)
+       ========================================================================== */
+    .metrics-section {
+      background: linear-gradient(180deg, rgba(7, 8, 13, 1) 0%, rgba(15, 18, 32, 0.8) 50%, rgba(7, 8, 13, 1) 100%);
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metrics-section::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 900px;
+      height: 400px;
+      background: radial-gradient(ellipse, rgba(0, 168, 255, 0.15) 0%, rgba(124, 58, 237, 0.08) 50%, transparent 80%);
+      filter: blur(100px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .metrics-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+      text-align: center;
+    }
+
+    .metric-card {
+      padding: 2rem 1.5rem;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      transition: var(--transition-smooth);
+    }
+
+    .metric-card:hover {
+      border-color: rgba(0, 168, 255, 0.3);
+      transform: translateY(-4px);
+    }
+
+    .metric-number {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 0.75rem;
+      background: var(--gradient-accent);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .metric-label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 0.35rem;
+    }
+
+    .metric-sub {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* ==========================================================================
+       9. TESTIMONIAL CAROUSEL
+       ========================================================================== */
+    .testimonial-wrapper {
+      position: relative;
+      max-width: 880px;
+      margin: 0 auto;
+    }
+
+    .testimonial-slider {
+      position: relative;
+      min-height: 290px;
+    }
+
+    .testimonial-slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.96) translateY(12px);
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    .testimonial-slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1) translateY(0);
+      pointer-events: auto;
+      position: relative;
+    }
+
+    .quote-icon {
+      font-size: 2.25rem;
+      color: var(--accent-blue);
+      opacity: 0.5;
+      margin-bottom: 1.25rem;
+    }
+
+    .testimonial-quote {
+      font-size: 1.28rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      font-style: normal;
+      font-weight: 400;
+      margin-bottom: 2rem;
+    }
+
+    .testimonial-author-box {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .author-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #00a8ff 0%, #7c3aed 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #ffffff;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 15px rgba(0, 168, 255, 0.3);
+    }
+
+    .author-info .author-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .author-info .author-role {
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+    }
+
+    .author-info .author-company {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* Carousel Controls */
+    .carousel-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .carousel-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-smooth);
+    }
+
+    .carousel-btn:hover {
+      background: var(--gradient-primary);
+      border-color: transparent;
+      box-shadow: 0 0 15px rgba(0, 168, 255, 0.4);
+    }
+
+    .carousel-dots {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.2);
+      transition: var(--transition-smooth);
+      cursor: pointer;
+    }
+
+    .dot.active {
+      width: 28px;
+      background: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan);
+    }
+
+    /* ==========================================================================
+       10. RESOURCE CENTER PREVIEW (Card Grid)
+       ========================================================================== */
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    .resource-card {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .resource-thumbnail {
+      width: 100%;
+      height: 190px;
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* CSS Gradient Art Thumbnails */
+    .thumb-1 {
+      background: radial-gradient(circle at 30% 30%, #1e1b4b 0%, #030712 90%);
+    }
+
+    .thumb-2 {
+      background: radial-gradient(circle at 70% 30%, #082f49 0%, #020617 90%);
+    }
+
+    .thumb-3 {
+      background: radial-gradient(circle at 50% 50%, #2e1065 0%, #030712 90%);
+    }
+
+    .thumb-art-svg {
+      width: 120px;
+      height: 120px;
+      opacity: 0.85;
+      filter: drop-shadow(0 0 20px rgba(0, 168, 255, 0.4));
+      transition: var(--transition-smooth);
+    }
+
+    .resource-card:hover .thumb-art-svg {
+      transform: scale(1.08) rotate(5deg);
+    }
+
+    .resource-tag {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .resource-body {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .resource-meta {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-bottom: 0.65rem;
+    }
+
+    .resource-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.35;
+      margin-bottom: 0.85rem;
+    }
+
+    .resource-excerpt {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .resource-link {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--accent-cyan);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: var(--transition-smooth);
+    }
+
+    .resource-link:hover {
+      gap: 0.75rem;
+      color: #ffffff;
+    }
+
+    /* ==========================================================================
+       11. CTA BANNER SECTION
+       ========================================================================== */
+    .cta-section {
+      padding: 100px 0;
+    }
+
+    .cta-banner {
+      position: relative;
+      background: linear-gradient(135deg, rgba(0, 168, 255, 0.12) 0%, rgba(124, 58, 237, 0.15) 50%, rgba(0, 229, 255, 0.08) 100%);
+      border: 1px solid rgba(0, 168, 255, 0.3);
+      border-radius: 24px;
+      padding: 5rem 3rem;
+      text-align: center;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -20px rgba(0, 168, 255, 0.25);
+    }
+
+    .cta-banner::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.25) 0%, transparent 70%);
+      filter: blur(80px);
+      pointer-events: none;
+    }
+
+    .cta-headline {
+      font-size: clamp(2.25rem, 4.5vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      margin-bottom: 1.25rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-subtext {
+      font-size: 1.15rem;
+      color: #cbd5e1;
+      max-width: 650px;
+      margin: 0 auto 2.5rem auto;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ==========================================================================
+       12. FOOTER (Multi-column)
+       ========================================================================== */
+    .footer {
+      background: #030407;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 90px 0 40px 0;
+      position: relative;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 4rem;
+    }
+
+    .footer-brand .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 1rem;
+    }
+
+    .footer-brand .brand-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 1.75rem;
+      max-width: 320px;
+    }
+
+    .social-links {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .social-link {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: var(--transition-smooth);
+    }
+
+    .social-link:hover {
+      background: rgba(0, 168, 255, 0.15);
+      border-color: var(--accent-blue);
+      color: var(--accent-cyan);
+      transform: translateY(-2px);
+    }
+
+    .footer-column .column-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #ffffff;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .footer-link {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      transition: var(--transition-smooth);
+    }
+
+    .footer-link:hover {
+      color: var(--accent-cyan);
+      transform: translateX(3px);
+    }
+
+    /* System Status indicator in footer */
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 5px 12px;
+      border-radius: 9999px;
+      margin-top: 1.5rem;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    /* Footer Bottom Bar */
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-top: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+    }
+
+    .footer-legal-links {
+      display: flex;
+      gap: 1.75rem;
+    }
+
+    .footer-legal-link:hover {
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       13. INTERACTIVE MODAL (Request a Demo)
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(16px);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-dialog {
+      background: #0d0f1a;
+      border: 1px solid rgba(0, 168, 255, 0.3);
+      border-radius: 20px;
+      max-width: 580px;
+      width: 100%;
+      padding: 2.75rem;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 168, 255, 0.15);
+      transform: scale(0.95) translateY(20px);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-backdrop.active .modal-dialog {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition-smooth);
+    }
+
+    .modal-close-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .modal-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-sub {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .demo-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .form-group-full {
+      grid-column: span 2;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.45rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-family: inherit;
+      font-size: 0.92rem;
+      color: #ffffff;
+      transition: var(--transition-smooth);
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.25);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .form-select option {
+      background: #0d0f1a;
+      color: #ffffff;
+    }
+
+    .form-submit-btn {
+      width: 100%;
+      margin-top: 0.75rem;
+      padding: 0.95rem;
+    }
+
+    /* Toast Notification */
+    .toast-notification {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #0b0e1b;
+      border: 1px solid var(--accent-cyan);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 229, 255, 0.3);
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      z-index: 3000;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      color: #ffffff;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast-notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      color: var(--accent-emerald);
+      font-size: 1.25rem;
+    }
+
+    /* ==========================================================================
+       14. RESPONSIVE DESIGN (Media Queries)
+       ========================================================================== */
+    @media (max-width: 1080px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .footer-grid {
+        grid-template-columns: 2fr 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .nav-links, .nav-signin {
+        display: none;
+      }
+      .mobile-toggle {
+        display: flex;
+      }
+      .mobile-drawer {
+        display: block;
+      }
+      .timeline-container {
+        grid-template-columns: 1fr;
+      }
+      .timeline-connector {
+        display: none;
+      }
+      .solutions-grid {
+        grid-template-columns: 1fr;
+      }
+      .resources-grid {
+        grid-template-columns: 1fr;
+      }
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .hero-stats-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .section {
+        padding: 70px 0;
+      }
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .cta-banner {
+        padding: 3.5rem 1.5rem;
+      }
+      .demo-form {
+        grid-template-columns: 1fr;
+      }
+      .form-group-full {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Lattice Grid Mask Background -->
+  <div class="bg-grid-pattern"></div>
+
+  <!-- ==========================================================================
+       1. NAVIGATION BAR
+       ========================================================================== -->
+  <header class="navbar" id="navbar">
+    <div class="container nav-container">
+      <!-- Logo -->
+      <a href="#" class="nav-logo" aria-label="MetaLattice Homepage">
+        <!-- High-tech Lattice SVG Icon -->
+        <svg class="logo-icon-svg" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="18,3 32,10 32,26 18,33 4,26 4,10" stroke="url(#logo-grad-1)" stroke-width="2.2" fill="none" opacity="0.8"/>
+          <line x1="18" y1="3" x2="18" y2="33" stroke="url(#logo-grad-2)" stroke-width="1.8" stroke-dasharray="2 2"/>
+          <line x1="4" y1="10" x2="32" y2="26" stroke="url(#logo-grad-2)" stroke-width="1.8"/>
+          <line x1="4" y1="26" x2="32" y2="10" stroke="url(#logo-grad-2)" stroke-width="1.8"/>
+          <!-- Lattice Nodes -->
+          <circle cx="18" cy="3" r="2.5" fill="#00e5ff"/>
+          <circle cx="32" cy="10" r="2.5" fill="#00a8ff"/>
+          <circle cx="32" cy="26" r="2.5" fill="#7c3aed"/>
+          <circle cx="18" cy="33" r="2.5" fill="#00e5ff"/>
+          <circle cx="4" cy="26" r="2.5" fill="#00a8ff"/>
+          <circle cx="4" cy="10" r="2.5" fill="#7c3aed"/>
+          <circle cx="18" cy="18" r="3.5" fill="#00e5ff" filter="url(#glow)"/>
+          <defs>
+            <linearGradient id="logo-grad-1" x1="4" y1="3" x2="32" y2="33" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#00e5ff"/>
+              <stop offset="0.5" stop-color="#00a8ff"/>
+              <stop offset="1" stop-color="#7c3aed"/>
+            </linearGradient>
+            <linearGradient id="logo-grad-2" x1="18" y1="3" x2="18" y2="33" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#00a8ff"/>
+              <stop offset="1" stop-color="#7c3aed"/>
+            </linearGradient>
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="2" result="blur"/>
+              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+            </filter>
+          </defs>
+        </svg>
+        <span>MetaLattice</span>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <!-- Platform Link -->
+          <li class="nav-item">
+            <a href="#features" class="nav-link">Platform</a>
+          </li>
+
+          <!-- Solutions Dropdown -->
+          <li class="nav-item">
+            <a href="#solutions" class="nav-link">
+              Solutions <i class="fa-solid fa-chevron-down"></i>
+            </a>
+            <ul class="nav-dropdown">
+              <li>
+                <a href="#solutions" class="dropdown-link">
+                  <i class="fa-solid fa-plane-up dropdown-icon"></i>
+                  <div class="dropdown-content">
+                    <div class="dropdown-title">Aerospace & Defense</div>
+                    <div class="dropdown-desc">Hypersonic mass reduction & satellite structures</div>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a href="#solutions" class="dropdown-link">
+                  <i class="fa-solid fa-bolt dropdown-icon"></i>
+                  <div class="dropdown-content">
+                    <div class="dropdown-title">Energy & Propulsion</div>
+                    <div class="dropdown-desc">Conformal heat exchangers & cooling jackets</div>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a href="#solutions" class="dropdown-link">
+                  <i class="fa-solid fa-car-side dropdown-icon"></i>
+                  <div class="dropdown-content">
+                    <div class="dropdown-title">Motorsport & Racing</div>
+                    <div class="dropdown-desc">Lightweight suspension uprights & aero parts</div>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a href="#solutions" class="dropdown-link">
+                  <i class="fa-solid fa-heart-pulse dropdown-icon"></i>
+                  <div class="dropdown-content">
+                    <div class="dropdown-title">Medical Devices</div>
+                    <div class="dropdown-desc">Trabecular osseointegration porous implants</div>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Resources Dropdown -->
+          <li class="nav-item">
+            <a href="#resources" class="nav-link">
+              Resources <i class="fa-solid fa-chevron-down"></i>
+            </a>
+            <ul class="nav-dropdown">
+              <li>
+                <a href="#resources" class="dropdown-link">
+                  <i class="fa-solid fa-book-open dropdown-icon"></i>
+                  <div class="dropdown-content">
+                    <div class="dropdown-title">Engineering Blog</div>
+                    <div class="dropdown-desc">Computational geometry deep-dives</div>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a href="#resources" class="dropdown-link">
+                  <i class="fa-solid fa-video dropdown-icon"></i>
+                  <div class="dropdown-content">
+                    <div class="dropdown-title">Webinars & Demos</div>
+                    <div class="dropdown-desc">Masterclasses with lead architects</div>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a href="#resources" class="dropdown-link">
+                  <i class="fa-solid fa-chart-line dropdown-icon"></i>
+                  <div class="dropdown-content">
+                    <div class="dropdown-title">Case Studies</div>
+                    <div class="dropdown-desc">Real mission results from enterprise teams</div>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a href="#resources" class="dropdown-link">
+                  <i class="fa-solid fa-code dropdown-icon"></i>
+                  <div class="dropdown-content">
+                    <div class="dropdown-title">Documentation & SDK</div>
+                    <div class="dropdown-desc">Headless Python API & C++ kernel docs</div>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Company Link -->
+          <li class="nav-item">
+            <a href="#testimonials" class="nav-link">Company</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Nav Actions Right -->
+      <div class="nav-actions">
+        <a href="#demo-modal" class="nav-signin" id="openSignInBtn">Sign In</a>
+        <button class="btn btn-primary btn-sm open-demo-trigger">
+          Request Demo
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <!-- Mobile Hamburger Toggle -->
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Navigation">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div class="mobile-drawer" id="mobileDrawer">
+    <ul class="mobile-drawer-links">
+      <li><a href="#features" class="mobile-drawer-link close-drawer">Platform Features</a></li>
+      <li>
+        <span class="mobile-drawer-link">Solutions</span>
+        <ul class="mobile-drawer-sublinks">
+          <li><a href="#solutions" class="mobile-drawer-sublink close-drawer">Aerospace & Defense</a></li>
+          <li><a href="#solutions" class="mobile-drawer-sublink close-drawer">Energy & Propulsion</a></li>
+          <li><a href="#solutions" class="mobile-drawer-sublink close-drawer">Motorsport & Racing</a></li>
+          <li><a href="#solutions" class="mobile-drawer-sublink close-drawer">Medical Devices</a></li>
+        </ul>
+      </li>
+      <li><a href="#how-it-works" class="mobile-drawer-link close-drawer">How It Works</a></li>
+      <li><a href="#resources" class="mobile-drawer-link close-drawer">Resources & Research</a></li>
+      <li><a href="#testimonials" class="mobile-drawer-link close-drawer">Testimonials</a></li>
+      <li style="margin-top: 1.5rem;">
+        <button class="btn btn-primary open-demo-trigger close-drawer" style="width: 100%;">
+          Request a Demo
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ==========================================================================
+       2. HERO SECTION (Full-viewport with Interactive Particle Canvas)
+       ========================================================================== -->
+  <section class="hero" id="hero">
+    <!-- Interactive Canvas Particle / Lattice System -->
+    <canvas id="heroCanvas"></canvas>
+    <div class="hero-overlay"></div>
+
+    <div class="container hero-container">
+      <div class="fade-in-element">
+        <div class="eyebrow">
+          <i class="fa-solid fa-atom"></i>
+          Next-Gen Computational Engineering • Platform 4.2
+        </div>
+      </div>
+
+      <h1 class="hero-headline fade-in-element">
+        From Requirements<br>
+        <span class="gradient-text">to Design in Minutes</span>
+      </h1>
+
+      <p class="hero-subheadline fade-in-element">
+        MetaLattice accelerates engineering with AI-driven computational design, implicit modeling, and physics-backed optimization — all in one platform.
+      </p>
+
+      <div class="hero-cta-group fade-in-element">
+        <button class="btn btn-primary open-demo-trigger">
+          Request a Demo
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+        <a href="#features" class="btn btn-secondary">
+          <i class="fa-solid fa-cube"></i>
+          Explore Platform
+        </a>
+      </div>
+
+      <div class="hero-trust-tag fade-in-element">
+        <span><i class="fa-solid fa-circle-check"></i> Zero Boolean Geometry Failures</span>
+        <span>•</span>
+        <span><i class="fa-solid fa-circle-check"></i> Embedded GPU Multiphysics</span>
+        <span>•</span>
+        <span><i class="fa-solid fa-circle-check"></i> SOC 2 Type II Certified</span>
+      </div>
+
+      <!-- Floating Stats Row Below Hero -->
+      <div class="hero-stats-row fade-in-element">
+        <div class="hero-stat-card">
+          <div class="hero-stat-number" data-target="500">500+</div>
+          <div class="hero-stat-label">Enterprise Users</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-number" data-target="10">10M+</div>
+          <div class="hero-stat-label">Models Exported</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-number" data-target="98">98%</div>
+          <div class="hero-stat-label">Engineer Satisfaction</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       3. TRUSTED BY SECTION
+       ========================================================================== -->
+  <section class="trusted-by" id="trusted">
+    <div class="container">
+      <p class="trusted-label">Trusted by world-class engineering teams across the globe</p>
+      <div class="trusted-logos-grid">
+        <!-- Boeing -->
+        <div class="logo-item" title="Boeing">
+          <i class="fa-solid fa-plane-departure"></i>
+          <span>BOEING</span>
+        </div>
+        <!-- Siemens -->
+        <div class="logo-item" title="Siemens">
+          <i class="fa-solid fa-bolt-lightning"></i>
+          <span>SIEMENS</span>
+        </div>
+        <!-- NASA -->
+        <div class="logo-item" title="NASA">
+          <i class="fa-solid fa-shuttle-space"></i>
+          <span>NASA</span>
+        </div>
+        <!-- Airbus -->
+        <div class="logo-item" title="Airbus">
+          <i class="fa-solid fa-wind"></i>
+          <span>AIRBUS</span>
+        </div>
+        <!-- SpaceX -->
+        <div class="logo-item" title="SpaceX">
+          <i class="fa-solid fa-rocket"></i>
+          <span>SPACEX</span>
+        </div>
+        <!-- Lockheed -->
+        <div class="logo-item" title="Lockheed Martin">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>LOCKHEED</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       4. CORE PLATFORM FEATURES (3-column grid)
+       ========================================================================== */
+  -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header fade-in-element">
+        <div class="eyebrow">
+          <i class="fa-solid fa-microchip"></i>
+          Uncompromising Computational Core
+        </div>
+        <h2 class="section-title">Engineered for Extreme Complexity</h2>
+        <p class="section-subtitle">
+          Traditional CAD breaks when geometries scale to millions of faces. MetaLattice operates directly on mathematical implicit fields, enabling unlimited complexity without crashing.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1: Implicit Modeling -->
+        <div class="glass-card feature-card fade-in-element">
+          <div>
+            <div class="feature-icon-wrapper">
+              <i class="fa-solid fa-cube"></i>
+            </div>
+            <h3 class="feature-title">Implicit Modeling</h3>
+            <p class="feature-desc">
+              Design without geometric fragility. MetaLattice's field-driven geometry eliminates mesh failures, filleting crashes, and constraint conflicts forever.
+            </p>
+          </div>
+          <div class="feature-tags">
+            <span class="feature-tag">Zero Boolean Errors</span>
+            <span class="feature-tag">Infinite Resolution</span>
+            <span class="feature-tag">Signed Distance Fields</span>
+          </div>
+        </div>
+
+        <!-- Feature 2: Physics AI -->
+        <div class="glass-card feature-card fade-in-element">
+          <div>
+            <div class="feature-icon-wrapper">
+              <i class="fa-solid fa-brain"></i>
+            </div>
+            <h3 class="feature-title">Physics AI</h3>
+            <p class="feature-desc">
+              Simulate thousands of design variants with embedded physics feedback — no manual FEA handoffs or mesh generation bottlenecks required.
+            </p>
+          </div>
+          <div class="feature-tags">
+            <span class="feature-tag">Surrogate Solvers</span>
+            <span class="feature-tag">Real-Time Stress</span>
+            <span class="feature-tag">Thermal Conduction</span>
+          </div>
+        </div>
+
+        <!-- Feature 3: Design Automation -->
+        <div class="glass-card feature-card fade-in-element">
+          <div>
+            <div class="feature-icon-wrapper">
+              <i class="fa-solid fa-diagram-project"></i>
+            </div>
+            <h3 class="feature-title">Design Automation</h3>
+            <p class="feature-desc">
+              Encode engineering logic once. Deploy reusable computational workflows across programs, teams, and supply chains via headless execution.
+            </p>
+          </div>
+          <div class="feature-tags">
+            <span class="feature-tag">Python & C++ API</span>
+            <span class="feature-tag">Headless CLI</span>
+            <span class="feature-tag">CI/CD Cad Pipelines</span>
+          </div>
+        </div>
+
+        <!-- Feature 4: Lattice Structures -->
+        <div class="glass-card feature-card fade-in-element">
+          <div>
+            <div class="feature-icon-wrapper">
+              <i class="fa-solid fa-network-wired"></i>
+            </div>
+            <h3 class="feature-title">Lattice Structures</h3>
+            <p class="feature-desc">
+              Generate optimized lattice, TPMS, and infill structures for additive manufacturing with a single command and smooth thickness gradients.
+            </p>
+          </div>
+          <div class="feature-tags">
+            <span class="feature-tag">Gyroid & Schwarz TPMS</span>
+            <span class="feature-tag">Conformal Infill</span>
+            <span class="feature-tag">Stress-Aligned Struts</span>
+          </div>
+        </div>
+
+        <!-- Feature 5: Multi-Solver Integration -->
+        <div class="glass-card feature-card fade-in-element">
+          <div>
+            <div class="feature-icon-wrapper">
+              <i class="fa-solid fa-arrows-split-up-and-left"></i>
+            </div>
+            <h3 class="feature-title">Multi-Solver Integration</h3>
+            <p class="feature-desc">
+              Connect natively to ANSYS, Abaqus, OpenFOAM, and NASTRAN for closed-loop multi-objective optimization and verification.
+            </p>
+          </div>
+          <div class="feature-tags">
+            <span class="feature-tag">Native ANSYS / Abaqus</span>
+            <span class="feature-tag">OpenFOAM Bridge</span>
+            <span class="feature-tag">Direct B-Rep / STEP</span>
+          </div>
+        </div>
+
+        <!-- Feature 6: Cloud Scale -->
+        <div class="glass-card feature-card fade-in-element">
+          <div>
+            <div class="feature-icon-wrapper">
+              <i class="fa-solid fa-cloud-bolt"></i>
+            </div>
+            <h3 class="feature-title">Cloud Scale</h3>
+            <p class="feature-desc">
+              Run parametric sweeps across thousands of design instances concurrently on MetaLattice Cloud without HPC overhead or queue bottlenecks.
+            </p>
+          </div>
+          <div class="feature-tags">
+            <span class="feature-tag">Parallel GPU Clusters</span>
+            <span class="feature-tag">Automated Pareto Sets</span>
+            <span class="feature-tag">Team Collaboration</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       5. HOW IT WORKS (3-step timeline section)
+       ========================================================================== -->
+  <section class="section" id="how-it-works" style="background: rgba(4, 5, 8, 0.6);">
+    <div class="container">
+      <div class="section-header fade-in-element">
+        <div class="eyebrow">
+          <i class="fa-solid fa-route"></i>
+          Predictable Workflow
+        </div>
+        <h2 class="section-title">From Concept to Print-Ready Geometry</h2>
+        <p class="section-subtitle">
+          Transform manual sketch-and-fail iterations into a streamlined algorithmic pipeline in three deterministic steps.
+        </p>
+      </div>
+
+      <div class="timeline-container">
+        <!-- Connecting Line -->
+        <div class="timeline-connector"></div>
+
+        <!-- Step 1 -->
+        <div class="glass-card timeline-card fade-in-element">
+          <div class="timeline-header">
+            <div class="step-badge">01</div>
+            <span class="step-status-chip">Step 1: Input</span>
+          </div>
+          <h3 class="timeline-card-title">Define Requirements</h3>
+          <p class="timeline-card-desc">
+            Set geometry, material bounds, and performance constraints in plain language or procedural nodes without manual meshing prep.
+          </p>
+          <div class="tech-code-box">
+            <span class="code-highlight">// Parametric Input Constraint</span><br>
+            target_mass: <span class="code-purple">&lt;= 1.85 kg</span><br>
+            boundary_step: <span class="code-green">"aero_pylon_v4.step"</span><br>
+            min_stiffness: <span class="code-purple">24.5 kN/mm</span><br>
+            flow_delta_p: <span class="code-purple">&lt; 12.0 kPa</span>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="glass-card timeline-card fade-in-element">
+          <div class="timeline-header">
+            <div class="step-badge step-2">02</div>
+            <span class="step-status-chip">Step 2: Synthesize</span>
+          </div>
+          <h3 class="timeline-card-title">Generate & Optimize</h3>
+          <p class="timeline-card-desc">
+            AI explores design space with physics-in-the-loop, generating functional TPMS and lattice variations optimized for your manufacturing process.
+          </p>
+          <div class="tech-code-box">
+            <span class="code-highlight">&gt; Executing GPU Field Solver...</span><br>
+            surrogate_eval: <span class="code-green">4,200 variants</span><br>
+            stress_peak: <span class="code-purple">192 MPa (Safety 2.1)</span><br>
+            opt_convergence: <span class="code-green">100% Validated</span>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="glass-card timeline-card fade-in-element">
+          <div class="timeline-header">
+            <div class="step-badge step-3">03</div>
+            <span class="step-status-chip">Step 3: Export</span>
+          </div>
+          <h3 class="timeline-card-title">Deploy with Confidence</h3>
+          <p class="timeline-card-desc">
+            Export validated, manufacturing-ready geometry straight into your PLM, slice stack (CLI/CLIx), or high-precision B-Rep STEP.
+          </p>
+          <div class="tech-code-box">
+            <span class="code-highlight">// Output Formats Ready</span><br>
+            ✔ <span class="code-green">Slice Stack (.CLI / .SLC)</span><br>
+            ✔ <span class="code-green">Full Exact STEP (AP242)</span><br>
+            ✔ <span class="code-green">Complete FEA Audit Log.pdf</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       6. INDUSTRY SOLUTIONS (2x2 visual grid)
+       ========================================================================== -->
+  <section class="section" id="solutions">
+    <div class="container">
+      <div class="section-header fade-in-element">
+        <div class="eyebrow">
+          <i class="fa-solid fa-crosshairs"></i>
+          Mission-Critical Applications
+        </div>
+        <h2 class="section-title">Industry Solutions</h2>
+        <p class="section-subtitle">
+          Leading engineering organizations rely on MetaLattice to solve extreme mechanical, thermal, and fluid engineering challenges.
+        </p>
+      </div>
+
+      <div class="solutions-grid">
+        <!-- Solution 1: Aerospace & Defense -->
+        <div class="solution-card fade-in-element">
+          <div>
+            <div class="solution-top">
+              <i class="fa-solid fa-fighter-jet solution-icon"></i>
+              <span class="solution-metric-badge">-48% Mass Reduction</span>
+            </div>
+            <h3 class="solution-title">Aerospace & Defense</h3>
+            <p class="solution-desc">
+              Lightweight flight brackets, satellite structural panels, and propulsion housings. Meet stringent vibration and thermal shock specifications while slashing payload launch costs.
+            </p>
+          </div>
+          <a href="#demo-modal" class="solution-link open-demo-trigger">
+            Learn More About Aerospace <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- Solution 2: Energy & Propulsion -->
+        <div class="solution-card fade-in-element">
+          <div>
+            <div class="solution-top">
+              <i class="fa-solid fa-fire-flame-curved solution-icon"></i>
+              <span class="solution-metric-badge">+310% Heat Flux</span>
+            </div>
+            <h3 class="solution-title">Energy & Propulsion</h3>
+            <p class="solution-desc">
+              Conformal micro-channel heat exchangers, regenerative rocket cooling jackets, and high-efficiency turbomachinery designed with triply periodic minimal surface architectures.
+            </p>
+          </div>
+          <a href="#demo-modal" class="solution-link open-demo-trigger">
+            Learn More About Energy <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- Solution 3: Motorsport & Racing -->
+        <div class="solution-card fade-in-element">
+          <div>
+            <div class="solution-top">
+              <i class="fa-solid fa-flag-checkered solution-icon"></i>
+              <span class="solution-metric-badge">48-Hr Design Turns</span>
+            </div>
+            <h3 class="solution-title">Motorsport & Racing</h3>
+            <p class="solution-desc">
+              Iterate structural suspension uprights, brake cooling channels, and crash attenuators between race weekends with automated track-telemetry driven optimization loops.
+            </p>
+          </div>
+          <a href="#demo-modal" class="solution-link open-demo-trigger">
+            Learn More About Motorsport <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+
+        <!-- Solution 4: Medical Devices -->
+        <div class="solution-card fade-in-element">
+          <div>
+            <div class="solution-top">
+              <i class="fa-solid fa-bone solution-icon"></i>
+              <span class="solution-metric-badge">Trabecular Pore Match</span>
+            </div>
+            <h3 class="solution-title">Medical Devices</h3>
+            <p class="solution-desc">
+              Synthesize patient-specific titanium spinal cages, cranial implants, and femoral stems with stochastic porous micro-lattices tailored for osseointegration and natural bone compliance.
+            </p>
+          </div>
+          <a href="#demo-modal" class="solution-link open-demo-trigger">
+            Learn More About Medical <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       7. SOCIAL PROOF / METRICS SECTION (Dark with gradient background)
+       ========================================================================== -->
+  <section class="section metrics-section" id="metrics">
+    <div class="container">
+      <div class="section-header fade-in-element">
+        <div class="eyebrow">
+          <i class="fa-solid fa-chart-simple"></i>
+          Proven At Scale
+        </div>
+        <h2 class="section-title">Numbers That Define the Future of Design</h2>
+        <p class="section-subtitle">
+          Validated by thousands of production flight hours, clinical implantations, and track-tested components.
+        </p>
+      </div>
+
+      <div class="metrics-grid">
+        <div class="metric-card fade-in-element">
+          <div class="metric-number" data-target="500">500+</div>
+          <div class="metric-label">Enterprise Customers</div>
+          <div class="metric-sub">Global Aerospace & Tech</div>
+        </div>
+
+        <div class="metric-card fade-in-element">
+          <div class="metric-number" data-target="10">10M+</div>
+          <div class="metric-label">Models Exported</div>
+          <div class="metric-sub">Zero Geometry Corruptions</div>
+        </div>
+
+        <div class="metric-card fade-in-element">
+          <div class="metric-number" data-target="3.2">3.2x</div>
+          <div class="metric-label">Design Cycle Speedup</div>
+          <div class="metric-sub">Weeks Condensed to Days</div>
+        </div>
+
+        <div class="metric-card fade-in-element">
+          <div class="metric-number" data-target="150">150+</div>
+          <div class="metric-label">Countries Reached</div>
+          <div class="metric-sub">Global Engineering Network</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       8. TESTIMONIAL CAROUSEL (3 cards)
+       ========================================================================== -->
+  <section class="section" id="testimonials">
+    <div class="container">
+      <div class="section-header fade-in-element">
+        <div class="eyebrow">
+          <i class="fa-solid fa-quote-left"></i>
+          Engineering Perspectives
+        </div>
+        <h2 class="section-title">What Lead Architects Say</h2>
+        <p class="section-subtitle">
+          Hear how forward-thinking engineering teams transformed their design-to-production lifecycle with MetaLattice.
+        </p>
+      </div>
+
+      <div class="testimonial-wrapper">
+        <div class="testimonial-slider" id="testimonialSlider">
+          <!-- Slide 1 -->
+          <div class="glass-card testimonial-slide active" data-index="0">
+            <i class="fa-solid fa-quote-left quote-icon"></i>
+            <p class="testimonial-quote">
+              "MetaLattice revolutionized our rocket manifold development. What previously required four senior FEA engineers six weeks of manual CAD rebuilds now completes in four hours with higher thermal efficiency and zero mesh failure."
+            </p>
+            <div class="testimonial-author-box">
+              <div class="author-avatar">ER</div>
+              <div class="author-info">
+                <div class="author-name">Dr. Elena Rostova</div>
+                <div class="author-role">VP of Aerostructures</div>
+                <div class="author-company">AeroX Propulsion Dynamics</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 2 -->
+          <div class="glass-card testimonial-slide" data-index="1">
+            <i class="fa-solid fa-quote-left quote-icon"></i>
+            <p class="testimonial-quote">
+              "The ability to grade TPMS gyroid densities directly against dynamic telemetry stress data allowed us to shed 14 kg from our suspension monocoque while increasing torsional rigidity by 22%."
+            </p>
+            <div class="testimonial-author-box">
+              <div class="author-avatar">MV</div>
+              <div class="author-info">
+                <div class="author-name">Marcus Vance</div>
+                <div class="author-role">Chief Structural Architect</div>
+                <div class="author-company">Aura Hypercar Racing</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 3 -->
+          <div class="glass-card testimonial-slide" data-index="2">
+            <i class="fa-solid fa-quote-left quote-icon"></i>
+            <p class="testimonial-quote">
+              "Traditional solid modeling software choked when generating custom porous micro-architectures for our orthopedic spinal cages. MetaLattice generates compliant stochastic lattices in seconds."
+            </p>
+            <div class="testimonial-author-box">
+              <div class="author-avatar">SC</div>
+              <div class="author-info">
+                <div class="author-name">Dr. Sarah Chen</div>
+                <div class="author-role">Director of Biomedical Engineering</div>
+                <div class="author-company">SyntheSys Orthopedics</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Carousel Navigation Controls -->
+        <div class="carousel-controls">
+          <button class="carousel-btn" id="prevTestimonial" aria-label="Previous Testimonial">
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <div class="carousel-dots" id="carouselDots">
+            <span class="dot active" data-slide="0"></span>
+            <span class="dot" data-slide="1"></span>
+            <span class="dot" data-slide="2"></span>
+          </div>
+          <button class="carousel-btn" id="nextTestimonial" aria-label="Next Testimonial">
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       9. RESOURCE CENTER PREVIEW (Card Grid)
+       ========================================================================== -->
+  <section class="section" id="resources" style="background: rgba(4, 5, 8, 0.4);">
+    <div class="container">
+      <div class="section-header fade-in-element">
+        <div class="eyebrow">
+          <i class="fa-solid fa-book"></i>
+          Knowledge Base & Research
+        </div>
+        <h2 class="section-title">Latest from the Computational Lab</h2>
+        <p class="section-subtitle">
+          In-depth technical whitepapers, webinars, and field studies on generative engineering and additive design.
+        </p>
+      </div>
+
+      <div class="resources-grid">
+        <!-- Resource Card 1: Blog Post -->
+        <div class="glass-card resource-card fade-in-element">
+          <div class="resource-thumbnail thumb-1">
+            <span class="resource-tag">Whitepaper</span>
+            <!-- Decorative SVG Mesh Art -->
+            <svg class="thumb-art-svg" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="40" stroke="#00a8ff" stroke-width="1.5" stroke-dasharray="4 4"/>
+              <ellipse cx="50" cy="50" rx="35" ry="18" stroke="#7c3aed" stroke-width="2"/>
+              <ellipse cx="50" cy="50" rx="18" ry="35" stroke="#00e5ff" stroke-width="2"/>
+              <circle cx="50" cy="50" r="6" fill="#00e5ff"/>
+            </svg>
+          </div>
+          <div class="resource-body">
+            <div class="resource-meta">14 Min Read • Computational Geometry</div>
+            <h3 class="resource-title">Implicit Modeling vs. B-Rep CAD: Why Boundary Representations Break at Scale</h3>
+            <p class="resource-excerpt">
+              A deep mathematical analysis into why signed distance fields (SDF) avoid the numerical instability of traditional NURBS and boundary curves.
+            </p>
+            <a href="#demo-modal" class="resource-link open-demo-trigger">
+              Read Paper <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Resource Card 2: Webinar -->
+        <div class="glass-card resource-card fade-in-element">
+          <div class="resource-thumbnail thumb-2">
+            <span class="resource-tag">Webinar</span>
+            <svg class="thumb-art-svg" viewBox="0 0 100 100" fill="none">
+              <polygon points="50,15 85,35 85,75 50,95 15,75 15,35" stroke="#00e5ff" stroke-width="2"/>
+              <polygon points="50,30 72,43 72,67 50,80 28,67 28,43" stroke="#7c3aed" stroke-width="1.5"/>
+              <circle cx="50" cy="50" r="8" fill="#00a8ff"/>
+            </svg>
+          </div>
+          <div class="resource-body">
+            <div class="resource-meta">45 Min • Technical Masterclass</div>
+            <h3 class="resource-title">Generative Heat Exchangers: Designing Multi-Fluid TPMS Structures</h3>
+            <p class="resource-excerpt">
+              Watch Senior Propulsion Engineers construct double-inlet gyroid exchangers with automated pressure drop balancing in real time.
+            </p>
+            <a href="#demo-modal" class="resource-link open-demo-trigger">
+              Watch Session <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Resource Card 3: Case Study -->
+        <div class="glass-card resource-card fade-in-element">
+          <div class="resource-thumbnail thumb-3">
+            <span class="resource-tag">Case Study</span>
+            <svg class="thumb-art-svg" viewBox="0 0 100 100" fill="none">
+              <rect x="25" y="25" width="50" height="50" stroke="#7c3aed" stroke-width="2" rx="8"/>
+              <line x1="25" y1="25" x2="75" y2="75" stroke="#00e5ff" stroke-width="1.5"/>
+              <line x1="75" y1="25" x2="25" y2="75" stroke="#00a8ff" stroke-width="1.5"/>
+              <circle cx="50" cy="50" r="10" stroke="#00e5ff" stroke-width="2" fill="#07080d"/>
+            </svg>
+          </div>
+          <div class="resource-body">
+            <div class="resource-meta">8 Min Read • Aerospace Case Study</div>
+            <h3 class="resource-title">How Hyperion Propulsion Cut Satellite Radiator Weight by 54%</h3>
+            <p class="resource-excerpt">
+              Discover how conformal lattice heat pipes allowed Hyperion to achieve higher heat rejection under severe space launch volume envelopes.
+            </p>
+            <a href="#demo-modal" class="resource-link open-demo-trigger">
+              Read Case Study <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       10. CTA BANNER SECTION
+       ========================================================================== -->
+  <section class="section cta-section" id="cta">
+    <div class="container">
+      <div class="cta-banner fade-in-element">
+        <div class="eyebrow" style="background: rgba(0, 168, 255, 0.15); border-color: var(--accent-blue);">
+          <i class="fa-solid fa-rocket"></i>
+          Accelerate Your Product Pipeline
+        </div>
+        <h2 class="cta-headline">Ready to Redefine Engineering?</h2>
+        <p class="cta-subtext">
+          Join over 500 pioneering aerospace, automotive, and medical teams pushing the boundaries of what can be designed and manufactured.
+        </p>
+        <div class="cta-actions">
+          <button class="btn btn-primary open-demo-trigger">
+            Request a Demo
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+          <a href="#contact" class="btn btn-secondary open-demo-trigger">
+            <i class="fa-solid fa-headset"></i>
+            Talk to an Engineer
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       11. FOOTER (Multi-column)
+       ========================================================================== -->
+  <footer class="footer" id="contact">
+    <div class="container">
+      <div class="footer-grid">
+        <!-- Brand Column -->
+        <div class="footer-brand">
+          <a href="#" class="brand-logo">
+            <!-- Inline SVG Logo -->
+            <svg class="logo-icon-svg" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="18,3 32,10 32,26 18,33 4,26 4,10" stroke="url(#f-logo)" stroke-width="2" fill="none"/>
+              <line x1="18" y1="3" x2="18" y2="33" stroke="#00a8ff" stroke-width="1.5"/>
+              <line x1="4" y1="10" x2="32" y2="26" stroke="#7c3aed" stroke-width="1.5"/>
+              <circle cx="18" cy="18" r="3" fill="#00e5ff"/>
+              <defs>
+                <linearGradient id="f-logo" x1="4" y1="3" x2="32" y2="33" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#00e5ff"/>
+                  <stop offset="1" stop-color="#7c3aed"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <span>MetaLattice</span>
+          </a>
+          <p class="brand-desc">
+            The next-generation computational engineering platform uniting implicit modeling, surrogate physics AI, and generative lattice automation.
+          </p>
+          <div class="social-links">
+            <a href="#" class="social-link" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+            <a href="#" class="social-link" aria-label="X (Twitter)"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="#" class="social-link" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+            <a href="#" class="social-link" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+            <a href="#" class="social-link" aria-label="Discord"><i class="fa-brands fa-discord"></i></a>
+          </div>
+
+          <div class="status-pill">
+            <span class="status-dot"></span>
+            <span>All Global Solvers Operational (99.99%)</span>
+          </div>
+        </div>
+
+        <!-- Column 1: Platform -->
+        <div class="footer-column">
+          <h4 class="column-title">Platform</h4>
+          <ul class="footer-links">
+            <li><a href="#features" class="footer-link">Implicit Modeling</a></li>
+            <li><a href="#features" class="footer-link">Physics AI Engine</a></li>
+            <li><a href="#features" class="footer-link">Lattice Architectures</a></li>
+            <li><a href="#features" class="footer-link">Multi-Solver Bridge</a></li>
+            <li><a href="#features" class="footer-link">Cloud HPC Infrastructure</a></li>
+            <li><a href="#features" class="footer-link">Headless Python API</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 2: Solutions -->
+        <div class="footer-column">
+          <h4 class="column-title">Solutions</h4>
+          <ul class="footer-links">
+            <li><a href="#solutions" class="footer-link">Aerospace & Defense</a></li>
+            <li><a href="#solutions" class="footer-link">Energy & Propulsion</a></li>
+            <li><a href="#solutions" class="footer-link">Motorsport & Racing</a></li>
+            <li><a href="#solutions" class="footer-link">Medical Implants</a></li>
+            <li><a href="#solutions" class="footer-link">Industrial Equipment</a></li>
+            <li><a href="#solutions" class="footer-link">Additive Contract Manufacturing</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Resources -->
+        <div class="footer-column">
+          <h4 class="column-title">Resources</h4>
+          <ul class="footer-links">
+            <li><a href="#resources" class="footer-link">Engineering Blog</a></li>
+            <li><a href="#resources" class="footer-link">Technical Documentation</a></li>
+            <li><a href="#resources" class="footer-link">API Specification</a></li>
+            <li><a href="#resources" class="footer-link">On-Demand Webinars</a></li>
+            <li><a href="#resources" class="footer-link">Benchmark Whitepapers</a></li>
+            <li><a href="#resources" class="footer-link">Community Forum</a></li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Company & Legal -->
+        <div class="footer-column">
+          <h4 class="column-title">Company</h4>
+          <ul class="footer-links">
+            <li><a href="#testimonials" class="footer-link">About Us</a></li>
+            <li><a href="#testimonials" class="footer-link">Careers <span style="font-size: 0.7rem; color: var(--accent-cyan);">(We're Hiring!)</span></a></li>
+            <li><a href="#testimonials" class="footer-link">Research Publications</a></li>
+            <li><a href="#testimonials" class="footer-link">Press & Media</a></li>
+            <li><a href="#contact" class="footer-link">Contact Sales</a></li>
+            <li><a href="#contact" class="footer-link">Security & Trust Center</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Bottom Bar -->
+      <div class="footer-bottom">
+        <div>
+          © 2026 MetaLattice Inc. All rights reserved.
+        </div>
+        <div class="footer-legal-links">
+          <a href="#" class="footer-legal-link">Privacy Policy</a>
+          <a href="#" class="footer-legal-link">Terms of Service</a>
+          <a href="#" class="footer-legal-link">EULA</a>
+          <a href="#" class="footer-legal-link">Export Controls (EAR/ITAR)</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       12. INTERACTIVE MODAL (Request a Demo Form)
+       ========================================================================== -->
+  <div class="modal-backdrop" id="demoModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-dialog">
+      <button class="modal-close-btn" id="closeModalBtn" aria-label="Close dialog">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="eyebrow" style="margin-bottom: 0.75rem;">
+        <i class="fa-solid fa-calendar-check"></i>
+        Private Enterprise Briefing
+      </div>
+      <h3 class="modal-title" id="modalTitle">Experience MetaLattice</h3>
+      <p class="modal-sub">
+        Schedule a 1-on-1 technical walk-through with our computational geometry specialists tailored to your CAD/FEA workflows.
+      </p>
+
+      <form class="demo-form" id="demoRequestForm">
+        <div>
+          <label class="form-label" for="firstName">First Name</label>
+          <input type="text" id="firstName" class="form-input" placeholder="e.g. Elena" required>
+        </div>
+        <div>
+          <label class="form-label" for="lastName">Last Name</label>
+          <input type="text" id="lastName" class="form-input" placeholder="e.g. Rostova" required>
+        </div>
+        <div class="form-group-full">
+          <label class="form-label" for="workEmail">Work Email</label>
+          <input type="email" id="workEmail" class="form-input" placeholder="elena.rostova@aerox.com" required>
+        </div>
+        <div>
+          <label class="form-label" for="companyName">Company</label>
+          <input type="text" id="companyName" class="form-input" placeholder="AeroX Propulsion" required>
+        </div>
+        <div>
+          <label class="form-label" for="industrySelect">Primary Industry</label>
+          <select id="industrySelect" class="form-select" required>
+            <option value="" disabled selected>Select Industry</option>
+            <option value="aerospace">Aerospace & Defense</option>
+            <option value="energy">Energy & Propulsion</option>
+            <option value="motorsport">Motorsport & Automotive</option>
+            <option value="medical">Medical Devices & Implants</option>
+            <option value="industrial">Industrial Machinery</option>
+            <option value="research">Academic / R&D</option>
+          </select>
+        </div>
+        <div class="form-group-full">
+          <label class="form-label" for="projectScope">Engineering Challenge</label>
+          <textarea id="projectScope" class="form-input" rows="3" placeholder="Describe your lightweighting, thermal management, or lattice modeling objectives..."></textarea>
+        </div>
+        <div class="form-group-full">
+          <button type="submit" class="btn btn-primary form-submit-btn">
+            Confirm Demo Reservation
+            <i class="fa-solid fa-calendar-check"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Interactive Toast Feedback -->
+  <div class="toast-notification" id="toastNotification">
+    <i class="fa-solid fa-circle-check toast-icon"></i>
+    <div>
+      <div style="font-weight: 700; font-size: 0.95rem;">Request Received!</div>
+      <div style="font-size: 0.8rem; color: #94a3b8;">Our computational engineering team will contact you shortly.</div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       VANILLA JAVASCRIPT LOGIC
+       ========================================================================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      /* ------------------------------------------------------------------------
+         1. HERO CANVAS PARTICLE / LATTICE SYSTEM
+         ------------------------------------------------------------------------ */
+      const canvas = document.getElementById('heroCanvas');
+      if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        let mouse = {
+          x: width / 2,
+          y: height / 2,
+          isHovered: false
+        };
+
+        window.addEventListener('resize', () => {
+          width = canvas.width = window.innerWidth;
+          height = canvas.height = window.innerHeight;
+          initParticles();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+          mouse.x = e.clientX;
+          mouse.y = e.clientY;
+          mouse.isHovered = true;
+        });
+
+        window.addEventListener('mouseleave', () => {
+          mouse.isHovered = false;
+        });
+
+        const particleCount = Math.min(Math.floor((width * height) / 14000), 100);
+        let particles = [];
+
+        class LatticeNode {
+          constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * 0.7;
+            this.vy = (Math.random() - 0.5) * 0.7;
+            this.radius = Math.random() * 2.2 + 1.2;
+            this.baseRadius = this.radius;
+            // Palette: electric blue, cyan, vivid purple
+            const colors = ['#00e5ff', '#00a8ff', '#7c3aed', '#38bdf8'];
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+            this.pulsePhase = Math.random() * Math.PI * 2;
+          }
+
+          update() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Bounce on boundaries
+            if (this.x < 0 || this.x > width) this.vx *= -1;
+            if (this.y < 0 || this.y > height) this.vy *= -1;
+
+            // Mouse interaction
+            if (mouse.isHovered) {
+              const dx = mouse.x - this.x;
+              const dy = mouse.y - this.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 180) {
+                const angle = Math.atan2(dy, dx);
+                const force = (180 - dist) / 180;
+                this.x -= Math.cos(angle) * force * 1.5;
+                this.y -= Math.sin(angle) * force * 1.5;
+              }
+            }
+
+            this.pulsePhase += 0.03;
+          }
+
+          draw() {
+            ctx.save();
+            ctx.beginPath();
+            const currentRadius = this.radius + Math.sin(this.pulsePhase) * 0.6;
+            ctx.arc(this.x, this.y, Math.max(0.8, currentRadius), 0, Math.PI * 2);
+            ctx.fillStyle = this.color;
+            ctx.shadowColor = this.color;
+            ctx.shadowBlur = 10;
+            ctx.fill();
+            ctx.restore();
+          }
+        }
+
+        function initParticles() {
+          particles = [];
+          const count = Math.min(Math.floor((width * height) / 14000), 90);
+          for (let i = 0; i < count; i++) {
+            particles.push(new LatticeNode());
+          }
+        }
+
+        initParticles();
+
+        function connectParticles() {
+          const maxDistance = 150;
+          for (let a = 0; a < particles.length; a++) {
+            for (let b = a + 1; b < particles.length; b++) {
+              const dx = particles[a].x - particles[b].x;
+              const dy = particles[a].y - particles[b].y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+
+              if (dist < maxDistance) {
+                const alpha = (1 - dist / maxDistance) * 0.45;
+                ctx.beginPath();
+                ctx.moveTo(particles[a].x, particles[a].y);
+                ctx.lineTo(particles[b].x, particles[b].y);
+                
+                // Dynamic gradient strut
+                const grad = ctx.createLinearGradient(particles[a].x, particles[a].y, particles[b].x, particles[b].y);
+                grad.addColorStop(0, `rgba(0, 168, 255, ${alpha})`);
+                grad.addColorStop(1, `rgba(124, 58, 237, ${alpha})`);
+                
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 1.1;
+                ctx.stroke();
+              }
+            }
+          }
+        }
+
+        function animate() {
+          ctx.clearRect(0, 0, width, height);
+
+          // Update & draw nodes
+          particles.forEach(p => {
+            p.update();
+            p.draw();
+          });
+
+          // Draw interconnecting lattice struts
+          connectParticles();
+
+          requestAnimationFrame(animate);
+        }
+
+        animate();
+      }
+
+      /* ------------------------------------------------------------------------
+         2. STICKY NAVBAR BACKGROUND SCROLL EFFECT
+         ------------------------------------------------------------------------ */
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 40) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      });
+
+      /* ------------------------------------------------------------------------
+         3. MOBILE NAVIGATION DRAWER TOGGLE
+         ------------------------------------------------------------------------ */
+      const mobileToggle = document.getElementById('mobileToggle');
+      const mobileDrawer = document.getElementById('mobileDrawer');
+      const closeDrawerElements = document.querySelectorAll('.close-drawer');
+
+      if (mobileToggle && mobileDrawer) {
+        mobileToggle.addEventListener('click', () => {
+          mobileDrawer.classList.toggle('open');
+          const spans = mobileToggle.querySelectorAll('span');
+          if (mobileDrawer.classList.contains('open')) {
+            spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+            spans[1].style.opacity = '0';
+            spans[2].style.transform = 'rotate(-45deg) translate(5px, -5px)';
+          } else {
+            spans[0].style.transform = 'none';
+            spans[1].style.opacity = '1';
+            spans[2].style.transform = 'none';
+          }
+        });
+
+        closeDrawerElements.forEach(item => {
+          item.addEventListener('click', () => {
+            mobileDrawer.classList.remove('open');
+            const spans = mobileToggle.querySelectorAll('span');
+            spans[0].style.transform = 'none';
+            spans[1].style.opacity = '1';
+            spans[2].style.transform = 'none';
+          });
+        });
+      }
+
+      /* ------------------------------------------------------------------------
+         4. SCROLL-TRIGGERED FADE-IN WITH INTERSECTION OBSERVER
+         ------------------------------------------------------------------------ */
+      const fadeElements = document.querySelectorAll('.fade-in-element');
+      const observerOptions = {
+        threshold: 0.15,
+        rootMargin: '0px 0px -40px 0px'
+      };
+
+      const fadeObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      fadeElements.forEach(el => fadeObserver.observe(el));
+
+      /* ------------------------------------------------------------------------
+         5. ANIMATED NUMBER COUNTERS (Metrics Section)
+         ------------------------------------------------------------------------ */
+      const metricElements = document.querySelectorAll('.metric-number');
+      let metricsCounted = false;
+
+      function countUpMetrics() {
+        metricElements.forEach(el => {
+          const rawTarget = el.getAttribute('data-target');
+          const isDecimal = rawTarget.includes('.');
+          const target = parseFloat(rawTarget);
+          const duration = 2000;
+          const frameDuration = 1000 / 60;
+          const totalFrames = Math.round(duration / frameDuration);
+          let frame = 0;
+
+          const counter = setInterval(() => {
+            frame++;
+            const progress = frame / totalFrames;
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const current = target * easeProgress;
+
+            if (isDecimal) {
+              el.textContent = current.toFixed(1) + 'x';
+            } else if (target >= 500) {
+              el.textContent = Math.floor(current) + '+';
+            } else if (target === 10) {
+              el.textContent = Math.floor(current) + 'M+';
+            } else {
+              el.textContent = Math.floor(current) + '+';
+            }
+
+            if (frame >= totalFrames) {
+              clearInterval(counter);
+              if (isDecimal) el.textContent = target + 'x';
+              else if (target === 10) el.textContent = target + 'M+';
+              else el.textContent = target + '+';
+            }
+          }, frameDuration);
+        });
+      }
+
+      const metricsSection = document.getElementById('metrics');
+      if (metricsSection) {
+        const metricsObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting && !metricsCounted) {
+              metricsCounted = true;
+              countUpMetrics();
+            }
+          });
+        }, { threshold: 0.25 });
+        metricsObserver.observe(metricsSection);
+      }
+
+      /* ------------------------------------------------------------------------
+         6. TESTIMONIAL CAROUSEL
+         ------------------------------------------------------------------------ */
+      const slides = document.querySelectorAll('.testimonial-slide');
+      const dots = document.querySelectorAll('.carousel-dots .dot');
+      const prevBtn = document.getElementById('prevTestimonial');
+      const nextBtn = document.getElementById('nextTestimonial');
+      let currentSlide = 0;
+      let carouselInterval = null;
+
+      function showSlide(index) {
+        slides.forEach(slide => slide.classList.remove('active'));
+        dots.forEach(dot => dot.classList.remove('active'));
+
+        currentSlide = (index + slides.length) % slides.length;
+        slides[currentSlide].classList.add('active');
+        if (dots[currentSlide]) {
+          dots[currentSlide].classList.add('active');
+        }
+      }
+
+      if (prevBtn && nextBtn) {
+        prevBtn.addEventListener('click', () => {
+          showSlide(currentSlide - 1);
+          resetCarouselTimer();
+        });
+
+        nextBtn.addEventListener('click', () => {
+          showSlide(currentSlide + 1);
+          resetCarouselTimer();
+        });
+
+        dots.forEach((dot, idx) => {
+          dot.addEventListener('click', () => {
+            showSlide(idx);
+            resetCarouselTimer();
+          });
+        });
+
+        function startCarouselTimer() {
+          carouselInterval = setInterval(() => {
+            showSlide(currentSlide + 1);
+          }, 6500);
+        }
+
+        function resetCarouselTimer() {
+          clearInterval(carouselInterval);
+          startCarouselTimer();
+        }
+
+        startCarouselTimer();
+      }
+
+      /* ------------------------------------------------------------------------
+         7. INTERACTIVE "REQUEST A DEMO" MODAL & TOAST
+         ------------------------------------------------------------------------ */
+      const demoModal = document.getElementById('demoModal');
+      const closeModalBtn = document.getElementById('closeModalBtn');
+      const demoTriggers = document.querySelectorAll('.open-demo-trigger, #openSignInBtn');
+      const demoForm = document.getElementById('demoRequestForm');
+      const toast = document.getElementById('toastNotification');
+
+      function openModal() {
+        if (demoModal) {
+          demoModal.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        }
+      }
+
+      function closeModal() {
+        if (demoModal) {
+          demoModal.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }
+
+      demoTriggers.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          openModal();
+        });
+      });
+
+      if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', closeModal);
+      }
+
+      if (demoModal) {
+        demoModal.addEventListener('click', (e) => {
+          if (e.target === demoModal) closeModal();
+        });
+      }
+
+      // Escape key to close modal
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && demoModal && demoModal.classList.contains('active')) {
+          closeModal();
+        }
+      });
+
+      // Handle Form Submission
+      if (demoForm) {
+        demoForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          closeModal();
+          demoForm.reset();
+
+          // Show Toast Notification
+          if (toast) {
+            toast.classList.add('show');
+            setTimeout(() => {
+              toast.classList.remove('show');
+            }, 5000);
+          }
+        });
+      }
+
+    });
+  </script>
+</body>
+</html>
