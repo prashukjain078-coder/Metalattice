@@ -3,6 +3,7 @@ import Lenis from "lenis"
 import MetalFrameCross from "./components/originkit/MetalFrameCross"
 import WobblingLatticeSphere from "./components/originkit/WobblingLatticeSphere"
 import { GlowButton } from './components/ui/GlowButton'
+import { useNavigate } from "react-router-dom"
 
 const features = [
   { t: "Rigid by design", d: "Every part is a hard-edged, chamfered frame that catches light like real metal." },
@@ -11,6 +12,7 @@ const features = [
 ]
 
 export default function App() {
+  const navigate = useNavigate()
   const crossRef = useRef<HTMLDivElement>(null)
   const sphereRef = useRef<HTMLDivElement>(null)
 
@@ -140,7 +142,7 @@ export default function App() {
 
         <div className="pointer-events-none flex flex-1 items-center justify-center pt-[18vh]">
           <div className="pointer-events-auto">
-            <GlowButton href="#about" className="mlb-lg">
+            <GlowButton onClick={() => navigate("/materialize")} className="mlb-lg">
               MATERIALIZE
             </GlowButton>
           </div>
