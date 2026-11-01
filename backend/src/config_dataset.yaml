@@ -1,0 +1,30 @@
+dataset_RL:
+    root_graph: /Users/prashukjain/Desktop/ml model backend trial/GraphMetaMat/dataset/transmission/ood
+    root_curve: /Users/prashukjain/Desktop/ml model backend trial/GraphMetaMat/dataset/transmission/ood
+    root_mapping: /Users/prashukjain/Desktop/ml model backend trial/GraphMetaMat/dataset/transmission/ood
+
+dataset:
+    curve_norm_cfg:
+        curve_method: null
+
+    root_graph: /Users/prashukjain/Desktop/ml model backend trial/GraphMetaMat/dataset/transmission/ood
+    root_curve: /Users/prashukjain/Desktop/ml model backend trial/GraphMetaMat/dataset/transmission/ood
+    root_mapping: /Users/prashukjain/Desktop/ml model backend trial/GraphMetaMat/dataset/transmission/ood
+
+    node_feat_cfg:
+        - x
+        - y
+        - z
+    edge_feat_cfg:
+         - l2_dist
+    digitize_cfg: null
+    augment_graph: false
+    augment_curve: false
+    batch_size: 64
+    num_workers: 0
+    train_split: train
+    valid_split: dev
+    test_split: test
+    is_zscore_graph: true
+    is_zscore_curve_magni: true
+    is_zscore_curve_shape: false

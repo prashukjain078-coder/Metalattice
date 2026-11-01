@@ -23,3 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
+
+# Python Backend ignores
+backend/dataset/
+backend/checkpoints/
+backend/logs/
+backend/**/__pycache__/
+backend/**/*.pyc
+backend/**/*.pt

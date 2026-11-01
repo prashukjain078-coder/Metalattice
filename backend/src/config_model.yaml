@@ -1,0 +1,90 @@
+forward_model:
+  dim: 128
+  encoder_cfg:
+    n_layers: 4
+    conv_type: MPNN
+    norm_type: GraphNorm
+    act: SiLU
+    skip: true
+    dropout: 0.0
+  pooler_cfg:
+    merge_name: CAT
+    pool_name: SUM
+  decoder_shape_nm: CNNLSTMDecoderOriginal
+  decoder_shape_cfg:
+    n_layers_cnn: 2
+    use_nonlinearity: True
+    n_start_tokens: 4
+    kernel_size: 8
+    n_layers_rnn: 1
+    module_rnn: GRU
+    stride: 8
+  decoder_magnitude_nm: MLPDecoder
+  decoder_magitude_cfg:
+    n_layers: 5
+    dropout: 0.0
+    use_skip: true
+    use_norm: true
+    act: SiLU
+  loss_name: mse
+  loss_coeff:
+    main_coeff: 0.0
+    magnitude_coeff: 0.0
+    shape_coeff: 1.0
+    smoothness_coeff: 0.0
+
+policy_network:
+  dim: 256
+  encoder_graph_cfg:
+    n_layers: 3
+    conv_type: GAT
+    norm_type: GraphNorm
+    act: SiLU
+    skip: true
+    dropout: 0.0
+  encoder_curve_cfg:
+    mlp_magnitude_cfg:
+      n_layers: 7
+      dropout: 0.0
+      use_skip: true
+      use_norm: true
+      act: SiLU
+    cnn_shape_cfg:
+      use_norm: true
+    mlp_shape_magnitude_cfg:
+      ins: shape
+      n_layers: 1
+      dropout: 0.0
+      use_skip: true
+      use_norm: true
+      act: SiLU
+  mlp_state_action_cfg:
+    n_layers: 1
+    dropout: 0.0
+    use_skip: true
+    use_norm: false
+    act: SiLU
+  readout_start_cfg:
+    n_layers: 2
+    dropout: 0.0
+    use_skip: true
+    use_norm: false
+    act: SiLU
+  readout_stop_cfg:
+    n_layers: 2
+    dropout: 0.0
+    use_skip: true
+    use_norm: false
+    act: SiLU
+  readout_end_cfg:
+    n_layers: 2
+    dropout: 0.0
+    use_skip: true
+    use_norm: false
+    act: SiLU
+  readout_rho_cfg:
+    n_layers: 5
+    dropout: 0.0
+    use_skip: true
+    use_norm: false
+    act: SiLU

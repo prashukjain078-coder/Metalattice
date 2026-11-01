@@ -1,0 +1,70 @@
+load_model: /Users/prashukjain/Desktop/ml model backend trial/GraphMetaMat/checkpoints/pretrain.pt
+
+load_model_IL: null
+load_model_RL: null
+
+log_dir: /Users/prashukjain/Desktop/ml model backend trial/GraphMetaMat/logs/transmission_forward
+
+plot_train_data: true
+run_optuna_parallel: true
+export_results: true
+device: cpu
+
+optimizer_decay: null
+optimizer_RL:
+    optimizer_name: Adam
+    optimizer_args:
+      lr: 0.001
+      eps: 1.0e-3
+
+optimizer:
+    optimizer_name: Adam
+    optimizer_args:
+      lr: 0.001
+
+forward:
+    train_config:
+        use_contrastive: true
+        num_epochs: 2000
+        num_epochs_freeze_encoder: null
+        num_epochs_per_valid: 200
+        best_checkpoint_metric: mae_shape
+        no_epoch_checkpoints: true
+        clip_grad: 5.0
+        plot_num_samples_max: 50
+        use_snapshot:
+            num_snapshots: 5
+            t_mult: 1.0
+
+inverse:
+    train_config:
+        num_imitation_epochs: 128
+        num_iters: 0
+        num_iters_per_train: 32
+        num_iters_per_valid: 128
+        save_interval: 128
+        norm_adv: true
+        entropy_coeff: 0.0
+        clip_grad: 0.01
+        rl_algorithm: PPO
+        clip_coeff: 0.15
+        scale_reward: false
+        norm_reward: false
+        use_scheduler: null
+        clip_reward:
+            min: -1.0
+            max: 1.0
+
+    search:
+        magnitude_coeff: 0.0
+        shape_coeff: 0.0
+        jaccard_coeff: 1.0
+        uncertainty_coeff: 0.0
+        constraint_n_nodes_min: 3
+        constraint_n_nodes_max: 4
+        constraint_rho_min: 0.05
+        constraint_rho_max: 0.25
+        constraint_rho_default: 0.15
+        num_runs_valid: 2
+        num_runs_test: 256
+        n_iterations_rho_binary_search: 16

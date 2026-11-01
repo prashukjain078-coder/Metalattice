@@ -1,0 +1,29 @@
+dataset_RL:
+    root_graph: /home/derek/Documents/GraphMetaMat/dataset/stress_strain/standard
+    root_curve: /home/derek/Documents/GraphMetaMat/dataset/stress_strain/standard
+    root_mapping: /home/derek/Documents/GraphMetaMat/dataset/stress_strain/standard
+
+dataset:
+    curve_norm_cfg:
+        curve_method: max
+    root_graph: /home/derek/Documents/GraphMetaMat/dataset/stress_strain/standard
+    root_curve: /home/derek/Documents/GraphMetaMat/dataset/stress_strain/standard
+    root_mapping: /home/derek/Documents/GraphMetaMat/dataset/stress_strain/standard
+
+    node_feat_cfg:
+        - x
+        - y
+        - z
+    edge_feat_cfg:
+         - l2_dist
+    digitize_cfg: null
+    augment_graph: false
+    augment_curve: false
+    batch_size: 128
+    num_workers: 0
+    train_split: train
+    valid_split: dev
+    test_split: test
+    is_zscore_graph: true
+    is_zscore_curve_magni: true
+    is_zscore_curve_shape: true
