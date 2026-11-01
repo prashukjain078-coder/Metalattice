@@ -95,7 +95,7 @@ export default function App() {
       {/* Header */}
       <header className="absolute inset-x-0 top-0 z-30 flex items-center justify-between border-b border-black/[0.06] bg-white/60 px-[6vw] py-5 backdrop-blur-md">
         <a href="#top" className="flex items-center gap-2.5 text-sm font-bold uppercase tracking-[0.14em]">
-          <span className="inline-block h-2 w-2 bg-black" />
+          <img src="/logo.png" alt="Metalattice Logo" className="h-6 w-6 object-contain" />
           Metalattice
         </a>
         <nav className="ml-auto mr-8 hidden gap-8 text-sm font-medium text-black/60 md:flex">
